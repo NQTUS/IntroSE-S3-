@@ -1,3 +1,7 @@
+# VIETNAM NATIONAL UNIVERSITY
+## UNIVERSITY OF SCIENCE
+### FACULTY OF INFORMATION TECHNOLOGY
+
 # Amazon S3 Overview
 
 ## I. Introduction
@@ -85,6 +89,8 @@ s3_client.put_object_acl(ACL='public-read', Bucket='<Tên_bucket>', Key='<Tên_�
   - `s3:ObjectRemoved:*`: Kích hoạt khi một đối tượng bị xóa.
   - `s3:ObjectRestore:*`: Kích hoạt khi khôi phục một đối tượng từ Glacier.
 - **VD Ứng Dụng**: Có thể tạo sự kiện để gửi thông báo khi ảnh hoặc video mới được tải lên từ một chuyến đi.
+
+![S3 Event Configuration](attachment:Screenshot 2024-10-26 142838.png)
 
 ### 2. Lambda Function
 - Lambda Function là một chức năng serverless có thể được kích hoạt bởi các sự kiện từ S3, cho phép xử lý dữ liệu hoặc thực hiện các hành động như thay đổi kích thước ảnh, lưu trữ dữ liệu phân tích, hoặc cập nhật cơ sở dữ liệu.
