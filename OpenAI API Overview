@@ -1,0 +1,66 @@
+# OpenAI API Overview
+
+## I. Introduction
+OpenAI API cung cấp nền tảng trí tuệ nhân tạo có khả năng tạo nội dung tự động, xử lý ngôn ngữ tự nhiên và trả lời các câu hỏi của người dùng. Với ứng dụng đi phượt, OpenAI API có thể giúp tự động hóa các nhiệm vụ như tạo lịch trình, gợi ý địa điểm, dịch ngôn ngữ, hay tương tác với khách hàng.
+
+## II. Core Concepts
+
+### 1. API Key
+- **Định nghĩa**: Là một mã khóa duy nhất được cung cấp cho từng tài khoản của OpenAI, dùng để xác thực và kiểm soát quyền truy cập vào các dịch vụ của OpenAI, bao gồm các mô hình như GPT-4, DALL-E, Whisper,... 
+- **Vai trò**: API Key là yếu tố bảo mật quan trọng, vì nó giúp OpenAI nhận biết ai đang sử dụng dịch vụ, hạn chế truy cập trái phép và kiểm soát giới hạn sử dụng cho từng người dùng.
+
+### 2. Models
+- **a) GPT-4**: Dùng để tạo nội dung, đưa ra đề xuất và xử lý ngôn ngữ tự nhiên. Ví dụ, GPT-4 có thể gợi ý địa điểm tham quan hoặc viết mô tả về điểm đến.
+- **b) Whisper**: Chuyển đổi giọng nói thành văn bản, hữu ích khi hướng dẫn viên cung cấp thông tin bằng giọng nói.
+- **c) Embeddings**: Dùng để tìm kiếm và sắp xếp các câu hỏi, gợi ý tương tự giúp tìm kiếm thông tin chuyến đi dựa trên sở thích người dùng.
+
+## III. Example Usage
+Dưới đây là ví dụ về cách sử dụng API của OpenAI để tạo ra một câu trả lời tự động.
+
+```javascript
+fetch("https://api.openai.com/v1/completions", {
+    method: "POST",
+    headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        prompt: "hello, how are you today?",
+        max_tokens: 500,
+        temperature: 0.2
+    })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));
+```
+
+### 1. Các Thành Phần Quan Trọng Trong Đoạn Code
+- **URL API**: `https://api.openai.com/v1/completions` là địa chỉ endpoint để tạo câu trả lời từ mô hình.
+- **Authorization Header**: Sử dụng `Bearer ${API_KEY}` để xác thực người dùng.
+- **Model**: `"gpt-3.5-turbo"` là mô hình sử dụng để tạo ra nội dung.
+- **Prompt**: Văn bản đầu vào để GPT-3.5 bắt đầu tạo nội dung.
+- **Max Tokens**: Giới hạn số lượng từ trong câu trả lời.
+- **Temperature**: Giá trị từ `0` đến `1` để điều chỉnh độ sáng tạo của mô hình; giá trị càng cao thì mô hình càng tạo ra các câu trả lời ngẫu nhiên hơn.
+
+## IV. Security Considerations
+
+### 1. Bảo Vệ API Key
+- Không được để lộ **API Key** trong client-side code vì nó có thể bị lạm dụng.
+- Nên lưu trữ API Key ở **backend server** và chỉ gửi yêu cầu đến OpenAI từ server.
+
+### 2. Xử Lý Lỗi (Error Handling)
+- Cần bổ sung phần xử lý lỗi khi gọi API để tránh các trường hợp không mong muốn.
+- Ví dụ: xử lý các lỗi liên quan đến kết nối mạng, lỗi xác thực (401 Unauthorized), hoặc vượt quá giới hạn gọi API (429 Too Many Requests).
+
+## V. Ứng Dụng Thực Tế
+
+### 1. Tạo Lịch Trình Tự Động
+GPT-4 có thể tự động tạo lịch trình du lịch dựa trên sở thích người dùng. Người dùng chỉ cần cung cấp thông tin về địa điểm muốn đến và thời gian, GPT-4 sẽ tạo ra kế hoạch chi tiết phù hợp.
+
+### 2. Phiên Dịch Ngôn Ngữ
+Whisper có thể được sử dụng để chuyển đổi giọng nói thành văn bản và GPT-4 có thể tiếp tục dịch sang ngôn ngữ khác, giúp người dùng tương tác với người dân địa phương dễ dàng hơn.
+
+### 3. Gợi Ý Địa Điểm Tham Quan
+Embeddings có thể giúp tạo ra các gợi ý về địa điểm tham quan dựa trên sở thích của người dùng. Ví dụ: nếu người dùng thích các địa điểm có cảnh thiên nhiên yên bình, Embeddings sẽ tìm kiếm và đưa ra các gợi ý phù hợp.
