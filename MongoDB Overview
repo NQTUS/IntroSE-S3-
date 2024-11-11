@@ -1,0 +1,150 @@
+# MongoDB Overview
+
+## MongoDB là gì?
+MongoDB là một cơ sở dữ liệu NoSQL mã nguồn mở, được thiết kế để lưu trữ và quản lý dữ liệu không có cấu trúc cố định (schema-less). MongoDB lưu dữ liệu dưới dạng các documents thay vì các bảng và hàng như trong cơ sở dữ liệu quan hệ. Documents được lưu trữ ở định dạng BSON (Binary JSON), giúp MongoDB phù hợp với dữ liệu phức tạp, đa dạng và dễ tương tác với các ứng dụng JavaScript.
+
+## Ưu điểm của MongoDB so với MySQL
+- **Tương thích JavaScript**: MongoDB lưu dữ liệu dưới dạng JSON/BSON, giúp dễ dàng tích hợp với các ứng dụng JavaScript.
+- **Embedded Documents**: Cho phép lưu lồng (nested) các document, giảm sự phụ thuộc vào JOIN và cải thiện hiệu suất truy vấn.
+- **Scalability**: Hỗ trợ sharding để phân phối dữ liệu trên nhiều máy chủ, giúp mở rộng quy mô hiệu quả.
+- **Schema-less**: Không yêu cầu cấu trúc cố định, linh hoạt khi thay đổi dữ liệu mà không cần thay đổi toàn bộ hệ thống.
+
+## Các khái niệm cốt lõi
+- **Documents**: Đơn vị lưu trữ cơ bản, lưu dưới dạng BSON, có thể chứa dữ liệu lồng.
+- **Collections**: Nhóm các documents, tương tự như bảng trong SQL nhưng không bắt buộc phải có cấu trúc giống nhau.
+- **NoSQL & Schema-less**: Cho phép lưu trữ linh hoạt và thay đổi cấu trúc dữ liệu mà không cần cập nhật schema cố định.
+- **Indexing**: Hỗ trợ tạo chỉ mục (index) để tăng tốc độ truy vấn.
+- **Aggregation**: Framework thực hiện các truy vấn phức tạp như GROUP BY, JOIN.
+- **Sharding**: Phân chia dữ liệu trên nhiều máy chủ.
+- **Replication**: Tạo bản sao lưu để đảm bảo tính sẵn sàng của dữ liệu.
+
+## Cách tạo Document
+Có thể tạo document bằng MongoDB Shell, sau đây là một số ví dụ cơ bản về thao tác với MongoDB Shell:
+
+### Tạo document:
+```javascript
+// Thêm một document vào collection `students`
+db.students.insertOne({
+    name: "Nguyễn Văn A",
+    age: 22,
+    courses: ["Math", "Science"],
+    address: {
+        city: "Hà Nội",
+        street: "Nguyễn Trãi"
+    }
+});
+```
+
+### Tìm kiếm document:
+```javascript
+// Tìm tất cả các document trong collection `students`
+db.students.find({});
+
+// Tìm document với điều kiện
+db.students.find({ age: { $gte: 20 } });
+```
+
+### Sắp xếp document:
+```javascript
+// Sắp xếp theo `age` giảm dần
+db.students.find().sort({ age: -1 });
+```
+
+### Nested document và operator:
+```javascript
+// Truy vấn các document có "city" là "Hà Nội" trong nested document `address`
+db.students.find({ "address.city": "Hà Nội" });
+
+// Sử dụng toán tử $in để tìm các document có khóa `courses` chứa "Math" hoặc "Science"
+db.students.find({ courses: { $in: ["Math", "Science"] } });
+```
+
+## MongoDB Driver
+MongoDB Driver là một thư viện cung cấp giao diện lập trình ứng dụng (API) để kết nối và tương tác với cơ sở dữ liệu MongoDB từ các ngôn ngữ lập trình khác nhau. Nó cung cấp các chức năng cơ bản như kết nối, truy vấn, thêm, xóa và cập nhật dữ liệu trong MongoDB. Driver cho phép các ứng dụng thực hiện các tác vụ MongoDB qua mạng một cách dễ dàng và có thể mở rộng.
+
+### Chức năng chính của MongoDB Driver:
+- **Kết nối với MongoDB**: Cho phép các ứng dụng thiết lập và quản lý kết nối tới cơ sở dữ liệu MongoDB.
+- **Tương tác với dữ liệu**: Cho phép thêm, xóa, cập nhật và truy vấn dữ liệu trong MongoDB.
+- **Hỗ trợ bất đồng bộ**: Hỗ trợ thực thi các truy vấn không đồng bộ (async), tối ưu hóa hiệu suất.
+- **Cấu hình dễ dàng**: Driver cung cấp nhiều tùy chọn cấu hình để tối ưu hóa cho các nhu cầu khác nhau.
+
+## Sử dụng MongoDB Driver với FastAPI
+MongoDB Driver cho Python là `motor`, hỗ trợ thao tác không đồng bộ (asynchronous) với MongoDB, rất phù hợp khi sử dụng cùng với FastAPI.
+
+### Cài đặt Motor:
+```bash
+pip install motor
+```
+
+### Kết nối MongoDB với FastAPI:
+```python
+from fastapi import FastAPI, HTTPException
+from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel
+from typing import List
+
+app = FastAPI()
+
+# Thiết lập kết nối MongoDB
+client = AsyncIOMotorClient("mongodb://localhost:27017")
+db = client.my_database  # Thay thế 'my_database' với tên database của bạn
+collection = db.students  # Thay thế 'students' với tên collection của bạn
+
+# Định nghĩa schema sử dụng Pydantic
+class Student(BaseModel):
+    name: str
+    age: int
+    courses: List[str]
+    address: dict
+
+# Thêm một document vào MongoDB
+@app.post("/students/")
+async def create_student(student: Student):
+    result = await collection.insert_one(student.dict())
+    return {"id": str(result.inserted_id)}
+
+# Lấy danh sách tất cả các document
+@app.get("/students/", response_model=List[Student])
+async def get_students():
+    students = await collection.find().to_list(100)
+    return students
+
+# Lấy một document theo ID
+@app.get("/students/{student_id}", response_model=Student)
+async def get_student(student_id: str):
+    student = await collection.find_one({"_id": student_id})
+    if student is None:
+        raise HTTPException(status_code=404, detail="Student not found")
+    return student
+```
+
+## MongoDB Aggregation Framework
+Aggregation Framework của MongoDB là một công cụ mạnh mẽ để thực hiện các truy vấn và phân tích phức tạp trên dữ liệu. Nó tương tự như các phép toán `GROUP BY` trong SQL và cho phép bạn thao tác với dữ liệu theo nhiều cách khác nhau.
+
+### Các bước cơ bản của Aggregation
+Aggregation hoạt động dựa trên một pipeline, nơi dữ liệu được truyền qua nhiều bước khác nhau để biến đổi và tổng hợp. Mỗi bước trong pipeline thực hiện một hoạt động cụ thể như lọc (`$match`), nhóm (`$group`), hay sắp xếp (`$sort`).
+
+### Ví dụ về Aggregation
+Dưới đây là một ví dụ về cách sử dụng Aggregation để tính số lượng sinh viên theo từng thành phố:
+```javascript
+// Đếm số lượng sinh viên theo thành phố
+db.students.aggregate([
+    { $group: { _id: "$address.city", totalStudents: { $sum: 1 } } },
+    { $sort: { totalStudents: -1 } }
+]);
+```
+Trong ví dụ trên:
+- `$group`: Nhóm các document theo trường `address.city` và tính tổng số sinh viên trong mỗi nhóm.
+- `$sort`: Sắp xếp kết quả theo `totalStudents` giảm dần.
+
+### Một số toán tử phổ biến trong Aggregation
+- **$match**: Lọc các document theo điều kiện nhất định (tương tự như `WHERE` trong SQL).
+- **$group**: Nhóm các document lại với nhau và có thể thực hiện các phép tính tổng, trung bình, đếm, v.v.
+- **$project**: Chọn các trường cụ thể để hiển thị (tương tự như `SELECT` trong SQL).
+- **$sort**: Sắp xếp các document theo một hoặc nhiều tiêu chí.
+- **$limit**: Giới hạn số lượng document trả về.
+
+Aggregation Framework giúp bạn có thể thực hiện các thao tác phức tạp trên dữ liệu một cách hiệu quả, phù hợp với các ứng dụng phân tích dữ liệu và báo cáo.
+
+Phân tích trên cung cấp một cái nhìn tổng quan về MongoDB, cách tạo document, và các thao tác với MongoDB sử dụng FastAPI. MongoDB Driver (Motor) rất phù hợp để làm việc với FastAPI do tính chất bất đồng bộ, giúp tối ưu hóa hiệu năng và tăng tính phản hồi của ứng dụng.
+
