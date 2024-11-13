@@ -1,0 +1,293 @@
+# Tổng Quan Về React Native
+
+React Native là một framework mã nguồn mở được phát triển bởi Facebook, cho phép lập trình viên xây dựng các ứng dụng di động đa nền tảng bằng JavaScript và React. Nó cho phép phát triển ứng dụng có thể chạy trên cả iOS và Android với cùng một mã nguồn.
+
+## 1) Cài Đặt Môi Trường
+- Tải Node.js và npm từ [Node.js](https://nodejs.org/en).
+- Cài đặt React Native CLI với lệnh:
+  ```bash
+  npm install -g react-native-cli
+  ```
+- Yêu cầu cài đặt Xcode (cho iOS) hoặc Android Studio (cho Android) để chạy trình giả lập.
+
+Để tạo dự án:
+```bash
+npx react-native init MyFirstApp
+cd MyFirstApp
+```
+
+## 2) Chạy Ứng Dụng
+- Bắt đầu server phát triển:
+  ```bash
+  npx react-native start
+  ```
+- Mở một cửa sổ terminal mới và chạy ứng dụng trên trình giả lập:
+  ```bash
+  npx react-native run-android  # Dành cho Android
+  npx react-native run-ios      # Dành cho iOS
+  ```
+
+## Cấu Trúc Dự Án Trong React Native
+Một dự án React Native cơ bản sẽ có cấu trúc như sau:
+
+- `App.js`: Điểm vào chính của ứng dụng.
+- `components/`: Thư mục chứa các component tùy chỉnh.
+- `screens/`: Thư mục chứa các màn hình (pages).
+
+Để cài đặt các thư viện phổ biến:
+```bash
+npm install axios @react-navigation/native @react-navigation/stack
+```
+
+## Các Thao Tác Cơ Bản Trong React Native
+
+### Tạo Component
+```jsx
+import React from 'react';
+import { Text, View } from 'react-native';
+
+const MyComponent = () => {
+  return (
+    <View>
+      <Text>Hello, React Native!</Text>
+    </View>
+  );
+};
+
+export default MyComponent;
+```
+
+### Tạo Giao Diện Với StyleSheet
+```jsx
+import React from 'react';
+import { Text, View, StyleSheet } from 'react-native';
+
+const MyComponent = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Hello, Styled Component!</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 20,
+    color: 'blue',
+  },
+});
+
+export default MyComponent;
+```
+
+### Quản Lý State Và Props
+- **State**: Là dữ liệu thay đổi bên trong component, sử dụng hook `useState`.
+- **Props**: Là dữ liệu truyền từ component cha xuống component con.
+
+```jsx
+import React, { useState } from 'react';
+import { View, Text, Button } from 'react-native';
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+
+  return (
+    <View>
+      <Text>Số đếm: {count}</Text>
+      <Button title="Tăng" onPress={() => setCount(count + 1)} />
+    </View>
+  );
+};
+
+export default Counter;
+```
+
+### Xử Lý Sự Kiện
+Trong React Native, các sự kiện như `onPress` (cho nút bấm) hoặc `onChangeText` (cho input) có thể được xử lý dễ dàng.
+
+```jsx
+import React, { useState } from 'react';
+import { View, TextInput, Text } from 'react-native';
+
+const InputExample = () => {
+  const [text, setText] = useState('');
+
+  return (
+    <View>
+      <TextInput
+        placeholder="Nhập vào đây..."
+        onChangeText={newText => setText(newText)}
+      />
+      <Text>Bạn đã nhập: {text}</Text>
+    </View>
+  );
+};
+
+export default InputExample;
+```
+
+### Điều Hướng Giữa Các Màn Hình
+Để điều hướng, thư viện `react-navigation` thường được sử dụng.
+
+```bash
+npm install @react-navigation/native
+npm install @react-navigation/stack
+```
+
+Cấu hình điều hướng Stack:
+```jsx
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import HomeScreen from './screens/HomeScreen';
+import DetailsScreen from './screens/DetailsScreen';
+
+const Stack = createStackNavigator();
+
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
+```
+
+### Các Component Cơ Bản Trong React Native
+- **Text**: Hiển thị văn bản.
+- **View**: Container chứa các thành phần khác.
+- **Image**: Hiển thị hình ảnh.
+- **Button**: Nút bấm.
+- **TextInput**: Ô nhập liệu cho người dùng.
+
+```jsx
+import React from 'react';
+import { View, Text, Image, Button, TextInput } from 'react-native';
+
+const BasicComponents = () => {
+  return (
+    <View>
+      <Text>Hello, đây là Text!</Text>
+      <Image source={{ uri: 'https://example.com/image.png' }} style={{ width: 100, height: 100 }} />
+      <Button title="Bấm vào tôi" onPress={() => alert('Nút đã được bấm!')} />
+      <TextInput placeholder="Nhập vào đây..." />
+    </View>
+  );
+};
+
+export default BasicComponents;
+```
+
+### Lấy Dữ Liệu Từ API
+Lấy dữ liệu từ server có thể được thực hiện bằng `fetch` API hoặc các thư viện như `axios`.
+
+```jsx
+import React, { useEffect, useState } from 'react';
+import { View, Text } from 'react-native';
+
+const FetchDataExample = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/todos/1')
+      .then(response => response.json())
+      .then(json => setData(json));
+  }, []);
+
+  return (
+    <View>
+      <Text>Data từ API:</Text>
+      {data && <Text>{JSON.stringify(data)}</Text>}
+    </View>
+  );
+};
+
+export default FetchDataExample;
+```
+
+## Xây Dựng PaGo
+
+### Tạo Màn Hình Chính
+Tạo `HomeScreen` cho các tính năng chính như bản đồ, các địa điểm du lịch, và chatbot.
+Tạo `ChatScreen` cho giao diện chatbot.
+
+```jsx
+import React from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+
+const HomeScreen = ({ navigation }) => {
+  return (
+    <View style={styles.container}>
+      <Text>Chào mừng bạn đến với ứng dụng đi phượt!</Text>
+      <Button title="Chat với bot" onPress={() => navigation.navigate('Chat')} />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
+
+export default HomeScreen;
+```
+
+### Cấu Hình Điều Hướng Giữa Các Màn Hình
+Cấu hình điều hướng stack cho các màn hình.
+Trong `App.js`, tạo điều hướng cơ bản cho `HomeScreen` và `ChatScreen`.
+
+```jsx
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import HomeScreen from './screens/HomeScreen';
+import ChatScreen from './screens/ChatScreen';
+
+const Stack = createStackNavigator();
+
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Chat" component={ChatScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
+```
+
+### Kết Nối Với FastAPI
+Tạo `services/api.js` để quản lý tất cả các yêu cầu tới API. Sử dụng `axios` để gửi yêu cầu đến backend FastAPI.
+
+```js
+import axios from 'axios';
+
+const API = axios.create({
+  baseURL: 'http://localhost:8000', // Địa chỉ backend của bạn
+});
+
+export const sendMessage = async (message) => {
+  try {
+    const response = await API.post('/chat', { message });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi gửi tin nhắn:', error);
+  }
+};
+```
